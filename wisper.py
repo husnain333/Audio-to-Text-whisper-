@@ -3,6 +3,8 @@ import whisper
 import tempfile
 import os
 
+
+
 # Set page config
 st.set_page_config(page_title="Audio Wizard", page_icon="🎙️", layout="wide")
 
@@ -57,6 +59,12 @@ st.markdown("<div class='upload-box'>", unsafe_allow_html=True)
 uploaded_file = st.file_uploader("Choose an audio file", type=["wav", "mp3", "m4a"])
 st.markdown("</div>", unsafe_allow_html=True)
 
+model_name = st.selectbox(
+    "Choose a Whisper model:",
+    ["tiny", "base", "small", "medium", "large"],
+    index=1
+)
+
 if uploaded_file is not None:
     # Display audio player
     st.audio(uploaded_file, format='audio/wav')
@@ -70,10 +78,10 @@ if uploaded_file is not None:
     if st.button("🪄 Transcribe Audio", key="transcribe_button", help="Click to start transcription"):
         with st.spinner("🔮 Casting transcription spell..."):
             # Load the Whisper model
-            model = whisper.load_model("base")
+            model = whisper.load_model(model_name)
 
             # Transcribe the audio
-            result = model.transcribe(tmp_file_path)
+            result = model.transcribe(tmp_file_path,verbose=1)
 
             # Display the transcribed text
             st.markdown("<div class='transcription-box'>", unsafe_allow_html=True)
