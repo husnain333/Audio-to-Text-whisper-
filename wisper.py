@@ -2,7 +2,8 @@ import streamlit as st
 import whisper
 import tempfile
 import os
-from transformers import pipeline  # For summarization
+
+
 
 # Set page config
 st.set_page_config(page_title="Audio Wizard", page_icon="🎙️", layout="wide")
@@ -49,15 +50,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Sidebar: Summary Generation Parameters
-st.sidebar.header("Summary Generation Parameters")
-max_summary_length = st.sidebar.number_input(
-    "Maximum summary length (in tokens)", min_value=40, max_value=500, value=150, step=10
-)
-min_summary_length = st.sidebar.number_input(
-    "Minimum summary length (in tokens)", min_value=20, max_value=max_summary_length, value=40, step=5
-)
-
 # Title and description
 st.title("🎙️ Audio Wizard")
 st.markdown("Transform your audio into text with the power of AI! Upload your file, hit transcribe, and watch the magic happen.")
@@ -89,34 +81,17 @@ if uploaded_file is not None:
             model = whisper.load_model(model_name)
 
             # Transcribe the audio
-            result = model.transcribe(tmp_file_path, verbose=1)
-            transcribed_text = result["text"]
+            result = model.transcribe(tmp_file_path,verbose=1)
 
             # Display the transcribed text
             st.markdown("<div class='transcription-box'>", unsafe_allow_html=True)
             st.subheader("✨ Transcription Result:")
-            st.write(transcribed_text)
-            st.markdown("</div>", unsafe_allow_html=True)
-
-            # Summarize the transcription using the user-specified lengths
-            st.markdown("<div class='transcription-box'>", unsafe_allow_html=True)
-            st.subheader("📝 Summary:")
-
-            # Initialize the summarization pipeline
-            summarizer = pipeline("summarization")
-            
-            # Generate the summary with user-defined lengths
-            summary = summarizer(
-                transcribed_text,
-                max_length=int(max_summary_length),
-                min_length=int(min_summary_length),
-                do_sample=False
-            )[0]["summary_text"]
-            st.write(summary)
+            st.write(result["text"])
             st.markdown("</div>", unsafe_allow_html=True)
 
     # Clean up the temporary file
     os.unlink(tmp_file_path)
+
 else:
     st.info("👆 Please upload an audio file to begin the transcription journey.")
 
